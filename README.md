@@ -15,3 +15,4 @@ look inside on your own machine, and the code behind every picture.
 
 Made by Bakytzhan Kurmanbek.
 Short versions of every lesson: [TikTok](https://www.tiktok.com/@code_easy8).
+Ideas for a lesson, a collaboration or a project? bakytzhan.kurmanbek@nu.edu.kz

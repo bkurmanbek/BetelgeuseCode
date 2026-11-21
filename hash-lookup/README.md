@@ -69,3 +69,5 @@ notebook and the code that reads every number.
 Made by Bakytzhan Kurmanbek.
 
 More lessons: [bkurmanbek on GitHub](https://github.com/bkurmanbek).
+
+Ideas for a lesson, a collaboration or a project? bakytzhan.kurmanbek@nu.edu.kz
