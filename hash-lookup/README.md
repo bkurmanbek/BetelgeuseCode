@@ -66,4 +66,6 @@ Found a mistake, or output that doesn't match? Open an issue with your Python ve
 Part of a series of short programming lessons that open up one everyday line of code: a video, these notes, a
 notebook and the code that reads every number.
 
+Made by Bakytzhan Kurmanbek.
+
 More lessons: [bkurmanbek on GitHub](https://github.com/bkurmanbek).

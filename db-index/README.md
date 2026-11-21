@@ -63,4 +63,6 @@ and your SQLite version.
 Part of a series of short programming lessons that show what happens under the hood: a video, these notes, a
 notebook and the code that reads every number from a real run.
 
+Made by Bakytzhan Kurmanbek.
+
 More lessons: [bkurmanbek on GitHub](https://github.com/bkurmanbek).
