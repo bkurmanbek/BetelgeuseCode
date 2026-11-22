@@ -1,22 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 250" width="760" height="250">
 <rect width="760" height="250" fill="#FFFFFF"/>
-<text x="150.0" y="18.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="start">largest gap between the rebuilt curve and the true count, away from the steps</text>
-<text x="140.0" y="51.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">smooth curve alone</text>
+<text x="150.0" y="18.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="start">largest gap between the rebuilt curve and the true count, away from the steps</text>
+<text x="140.0" y="51.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">smooth curve alone</text>
 <rect x="150" y="36" width="490.0" height="22" rx="3" fill="#1D5FD0"/>
-<text x="648.0" y="51.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1D5FD0" text-anchor="start">0.916</text>
-<text x="140.0" y="85.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 1 zero</text>
+<text x="648.0" y="51.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1D5FD0" text-anchor="start">0.916</text>
+<text x="140.0" y="85.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 1 zero</text>
 <rect x="150" y="70" width="397.5" height="22" rx="3" fill="#1E7346"/>
-<text x="555.5" y="85.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.743</text>
-<text x="140.0" y="119.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 3 zeros</text>
+<text x="555.5" y="85.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.743</text>
+<text x="140.0" y="119.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 3 zeros</text>
 <rect x="150" y="104" width="354.1" height="22" rx="3" fill="#1E7346"/>
-<text x="512.1" y="119.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.662</text>
-<text x="140.0" y="153.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 10 zeros</text>
+<text x="512.1" y="119.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.662</text>
+<text x="140.0" y="153.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 10 zeros</text>
 <rect x="150" y="138" width="295.3" height="22" rx="3" fill="#1E7346"/>
-<text x="453.3" y="153.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.552</text>
-<text x="140.0" y="187.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 30 zeros</text>
+<text x="453.3" y="153.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.552</text>
+<text x="140.0" y="187.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 30 zeros</text>
 <rect x="150" y="172" width="252.0" height="22" rx="3" fill="#1E7346"/>
-<text x="410.0" y="187.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.471</text>
-<text x="140.0" y="221.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 100 zeros</text>
+<text x="410.0" y="187.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.471</text>
+<text x="140.0" y="221.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="end">+ 100 zeros</text>
 <rect x="150" y="206" width="137.5" height="22" rx="3" fill="#1E7346"/>
-<text x="295.5" y="221.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.257</text>
+<text x="295.5" y="221.0" font-family="CMU Serif, Latin Modern Roman, Computer Modern, serif" font-size="12" font-weight="700" fill="#1E7346" text-anchor="start">0.257</text>
 </svg>
