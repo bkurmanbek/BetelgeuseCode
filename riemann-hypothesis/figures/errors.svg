@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380">
+<rect width="760" height="380" fill="#FFFFFF"/>
+<line x1="78" y1="324.0" x2="610" y2="324.0" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="328.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">0.1</text>
+<line x1="78" y1="291.8" x2="610" y2="291.8" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="295.8" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">1</text>
+<line x1="78" y1="259.6" x2="610" y2="259.6" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="263.6" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">10</text>
+<line x1="78" y1="227.3" x2="610" y2="227.3" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="231.3" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">100</text>
+<line x1="78" y1="195.1" x2="610" y2="195.1" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="199.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">1k</text>
+<line x1="78" y1="162.9" x2="610" y2="162.9" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="166.9" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">10k</text>
+<line x1="78" y1="130.7" x2="610" y2="130.7" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="134.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">100k</text>
+<line x1="78" y1="98.4" x2="610" y2="98.4" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="102.4" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">1M</text>
+<line x1="78" y1="66.2" x2="610" y2="66.2" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="70.2" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">10M</text>
+<line x1="78" y1="34.0" x2="610" y2="34.0" stroke="#D9DDE3" stroke-width="1"/>
+<text x="70.0" y="38.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="end">100M</text>
+<line x1="78.0" y1="324" x2="78.0" y2="329" stroke="#5C636E"/>
+<text x="78.0" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">10</text>
+<line x1="126.4" y1="324" x2="126.4" y2="329" stroke="#5C636E"/>
+<text x="126.4" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">100</text>
+<line x1="174.7" y1="324" x2="174.7" y2="329" stroke="#5C636E"/>
+<text x="174.7" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">1k</text>
+<line x1="223.1" y1="324" x2="223.1" y2="329" stroke="#5C636E"/>
+<text x="223.1" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">10k</text>
+<line x1="271.5" y1="324" x2="271.5" y2="329" stroke="#5C636E"/>
+<text x="271.5" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">100k</text>
+<line x1="319.8" y1="324" x2="319.8" y2="329" stroke="#5C636E"/>
+<text x="319.8" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">1M</text>
+<line x1="368.2" y1="324" x2="368.2" y2="329" stroke="#5C636E"/>
+<text x="368.2" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">10M</text>
+<line x1="416.5" y1="324" x2="416.5" y2="329" stroke="#5C636E"/>
+<text x="416.5" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">100M</text>
+<line x1="464.9" y1="324" x2="464.9" y2="329" stroke="#5C636E"/>
+<text x="464.9" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">1B</text>
+<line x1="513.3" y1="324" x2="513.3" y2="329" stroke="#5C636E"/>
+<text x="513.3" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">10B</text>
+<line x1="561.6" y1="324" x2="561.6" y2="329" stroke="#5C636E"/>
+<text x="561.6" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">100B</text>
+<line x1="610.0" y1="324" x2="610.0" y2="329" stroke="#5C636E"/>
+<text x="610.0" y="343.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="middle">1,000B</text>
+<line x1="78" y1="324" x2="610" y2="324" stroke="#5C636E" stroke-width="1.2"/>
+<text x="344.0" y="368.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="middle">counting up to x</text>
+<text x="70.0" y="20.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12" font-weight="400" fill="#15171A" text-anchor="start">how far off the true count</text>
+<polyline points="78.0,264.0 126.4,238.2 174.7,216.4 223.1,196.3 271.5,177.0 319.8,158.4 368.2,140.1 416.5,122.1 464.9,104.4 513.3,86.8 561.6,69.3 610.0,52.0" fill="none" stroke="#1D5FD0" stroke-width="2.6" stroke-linejoin="round"/>
+<circle cx="78.0" cy="264.0" r="4" fill="#1D5FD0"/>
+<circle cx="126.4" cy="238.2" r="4" fill="#1D5FD0"/>
+<circle cx="174.7" cy="216.4" r="4" fill="#1D5FD0"/>
+<circle cx="223.1" cy="196.3" r="4" fill="#1D5FD0"/>
+<circle cx="271.5" cy="177.0" r="4" fill="#1D5FD0"/>
+<circle cx="319.8" cy="158.4" r="4" fill="#1D5FD0"/>
+<circle cx="368.2" cy="140.1" r="4" fill="#1D5FD0"/>
+<circle cx="416.5" cy="122.1" r="4" fill="#1D5FD0"/>
+<circle cx="464.9" cy="104.4" r="4" fill="#1D5FD0"/>
+<circle cx="513.3" cy="86.8" r="4" fill="#1D5FD0"/>
+<circle cx="561.6" cy="69.3" r="4" fill="#1D5FD0"/>
+<circle cx="610.0" cy="52.0" r="4" fill="#1D5FD0"/>
+<text x="620.0" y="56.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#1D5FD0" text-anchor="start">√x · log x</text>
+<text x="620.0" y="71.0" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#1D5FD0" text-anchor="start">27.6M</text>
+<polyline points="78.0,281.0 126.4,268.9 174.7,260.1 223.1,252.0 271.5,240.9 319.8,223.7 368.2,210.2 416.5,199.1 464.9,187.7 513.3,179.3 561.6,160.8 610.0,144.1" fill="none" stroke="#B42A30" stroke-width="2.6" stroke-linejoin="round"/>
+<circle cx="78.0" cy="281.0" r="4" fill="#B42A30"/>
+<circle cx="126.4" cy="268.9" r="4" fill="#B42A30"/>
+<circle cx="174.7" cy="260.1" r="4" fill="#B42A30"/>
+<circle cx="223.1" cy="252.0" r="4" fill="#B42A30"/>
+<circle cx="271.5" cy="240.9" r="4" fill="#B42A30"/>
+<circle cx="319.8" cy="223.7" r="4" fill="#B42A30"/>
+<circle cx="368.2" cy="210.2" r="4" fill="#B42A30"/>
+<circle cx="416.5" cy="199.1" r="4" fill="#B42A30"/>
+<circle cx="464.9" cy="187.7" r="4" fill="#B42A30"/>
+<circle cx="513.3" cy="179.3" r="4" fill="#B42A30"/>
+<circle cx="561.6" cy="160.8" r="4" fill="#B42A30"/>
+<circle cx="610.0" cy="144.1" r="4" fill="#B42A30"/>
+<text x="620.0" y="148.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#B42A30" text-anchor="start">Gauss&#x27;s curve</text>
+<text x="620.0" y="163.1" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#B42A30" text-anchor="start">38.3k</text>
+<polyline points="78.0,299.8 126.4,297.6 174.7,306.1 223.1,281.6 271.5,270.5 319.8,244.5 368.2,229.1 416.5,227.8 464.9,230.7 513.3,186.7 561.6,183.3 610.0,189.7" fill="none" stroke="#5C636E" stroke-width="2.6" stroke-linejoin="round"/>
+<circle cx="78.0" cy="299.8" r="4" fill="#5C636E"/>
+<circle cx="126.4" cy="297.6" r="4" fill="#5C636E"/>
+<circle cx="174.7" cy="306.1" r="4" fill="#5C636E"/>
+<circle cx="223.1" cy="281.6" r="4" fill="#5C636E"/>
+<circle cx="271.5" cy="270.5" r="4" fill="#5C636E"/>
+<circle cx="319.8" cy="244.5" r="4" fill="#5C636E"/>
+<circle cx="368.2" cy="229.1" r="4" fill="#5C636E"/>
+<circle cx="416.5" cy="227.8" r="4" fill="#5C636E"/>
+<circle cx="464.9" cy="230.7" r="4" fill="#5C636E"/>
+<circle cx="513.3" cy="186.7" r="4" fill="#5C636E"/>
+<circle cx="561.6" cy="183.3" r="4" fill="#5C636E"/>
+<circle cx="610.0" cy="189.7" r="4" fill="#5C636E"/>
+<text x="620.0" y="193.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#5C636E" text-anchor="start">Riemann&#x27;s curve</text>
+<text x="620.0" y="208.7" font-family="Inter, Helvetica, Arial, sans-serif" font-size="11" font-weight="400" fill="#5C636E" text-anchor="start">1.48k</text>
+</svg>
