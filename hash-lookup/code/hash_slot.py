@@ -2,7 +2,7 @@
 
     python3 code/hash_slot.py              # the lesson's keys with PYTHONHASHSEED=0: the numbers in the video
     python3 code/hash_slot.py --salted     # the same keys with this process's own random salt
-    python3 code/hash_slot.py bob eve      # your own keys
+    python3 code/hash_slot.py maria omar   # your own keys
 
 Under a second (it starts a few fresh Pythons to show the salt). Standard library only, any Python 3.8+.
 
@@ -46,11 +46,12 @@ def main() -> None:
           f"{hi.width}-bit · PYTHONHASHSEED={seed}\n")
 
     keys = a.keys or KEYS + [MISSING]
-    print(f"{'key':<6} {'hash(key)':>21}   {'last 8 bits':<12} {'& 7':>4} {'& 15':>5}")
+    w = max(6, *(len(repr(k)) for k in keys))
+    print(f"{'key':<{w}} {'hash(key)':>21}   {'last 8 bits':<12} {'& 7':>4} {'& 15':>5}")
     for k in keys:
         h = hash(k)
         note = "   (not in the lesson's dict)" if k == MISSING and not a.keys else ""
-        print(f"{k!r:<6} {h:>21}   ...{h & 0xFF:08b}  {h & 7:>4} {h & 15:>5}{note}")
+        print(f"{k!r:<{w}} {h:>21}   ...{h & 0xFF:08b}  {h & 7:>4} {h & 15:>5}{note}")
     print("\n& 7 keeps the last 3 bits: a slot from 0 to 7 in a table of 8 slots. & 15 keeps 4 bits: 16 slots.")
     print("A table's size is always a power of two, so 'hash mod size' is just this mask: no division.")
 

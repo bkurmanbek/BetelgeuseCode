@@ -3,7 +3,7 @@ Reads it from the file itself: the page size in the file header, the shape of th
 signposts, and the first leaf page down to the bytes of one row.
 
     python3 pages.py --quick          # 100,000 rows: about a second
-    python3 pages.py                  # the notes' 1,000,000-row table: ~3 s, 35 MB in a temporary folder
+    python3 pages.py                  # the notes' 1,000,000-row table: ~4 s, 41 MB in a temporary folder
     python3 pages.py --db users.db    # keep the database file afterwards
 
 Standard library only. Decodes pages per https://www.sqlite.org/fileformat2.html (sections 1.3, 1.6, 2.1).

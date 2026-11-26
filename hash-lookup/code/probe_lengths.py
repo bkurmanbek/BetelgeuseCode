@@ -1,16 +1,17 @@
-"""The limit of "one slot": how many slots lookups really visit in a big, real table (a set of 10 million names).
+"""The limit of "one slot": how many slots lookups really visit in a big, real table (a set of 10 million keys).
 
-    python3 code/probe_lengths.py --quick   # 200,000 names, 20,000 missing names: a few seconds
-    python3 code/probe_lengths.py           # 10,000,000 names, 1,000,000 missing: about 25 s, 1.3 GB of RAM
+    python3 code/probe_lengths.py --quick   # 200,000 keys, 20,000 missing keys: a few seconds
+    python3 code/probe_lengths.py           # 10,000,000 keys, 1,000,000 missing: about 20 s, 1.3 GB of RAM
 
 CPython 3.11 or newer, 64-bit (it reads the set's table in place with ctypes). Standard library only. Re-runs
 itself with PYTHONHASHSEED=0, so the table, and every number it prints, is the same on every run.
 
-How: build a set of N shuffled names (seed 42: user00000000, user00000001, …), view its table in memory without
-copying it, then for every name walk the path `set_lookkey` in Objects/setobject.c walks (the home slot, up to 9
-neighbours, then a jump mixed from the hash's higher bits) and count the slots until it meets the name (a hit) or
-an empty slot (a miss: the name can't be further along, it would have been placed there). A set packs up to
-three-fifths of its slots, a dict up to two-thirds; the dict's path has no neighbour run, only the jumps.
+How: build a set of N shuffled usernames (seed 42: user00000000, user00000001, …, the strings our run used, so
+the full run prints the notes' numbers), view its table in memory without copying it, then for every key walk the
+path `set_lookkey` in Objects/setobject.c walks (the home slot, up to 9 neighbours, then a jump mixed from the
+hash's higher bits) and count the slots until it meets the key (a hit) or an empty slot (a miss: the key can't be
+further along, it would have been placed there). A set packs up to three-fifths of its slots, a dict up to
+two-thirds; the dict's path has no neighbour run, only the jumps.
 """
 
 from __future__ import annotations
@@ -26,7 +27,7 @@ import cpython_tables as ct
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--quick", action="store_true")
-    ap.add_argument("--n", type=int, help="names in the set")
+    ap.add_argument("--n", type=int, help="keys in the set")
     a = ap.parse_args()
     ct.with_hash_seed("0")
     try:
@@ -49,7 +50,7 @@ def main() -> None:
     keys = memoryview((ctypes.c_char * (16 * size)).from_address(table)).cast("B").cast("q")   # no copy
     if t is not None:
         assert [keys[2 * i] or None for i in range(size)] == [id(x) if x is not None else None for x in t["slots"]]
-    print(f"{n:,} names in {size:,} slots: {used / size:.1%} full")
+    print(f"{n:,} keys in {size:,} slots: {used / size:.1%} full")
 
     def visits(x, hit: bool) -> int:
         h = hash(x)
@@ -83,13 +84,13 @@ def main() -> None:
         print(f"  9+ {'█' * round(rest * 50):<50} {rest:6.1%}")
 
     hits = [visits(x, True) for x in names]
-    summary("every name in the set (hits)", hits, "found in the first slot visited")
+    summary("every key in the set (hits)", hits, "found in the first slot visited")
     print(f"  within two slots: {sum(c <= 2 for c in hits) / len(hits):.1%}")
     misses = []
     for i in range(n, n + n_miss):
         x = f"user{i:08d}"
         misses.append(visits(x, False))
-    summary(f"names not in the set (misses: user{n:08d} on)", misses,
+    summary(f"keys not in the set (misses: user{n:08d} on)", misses,
             "proved absent at the first slot (it was empty)")
 
 

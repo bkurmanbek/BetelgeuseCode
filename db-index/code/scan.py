@@ -1,16 +1,16 @@
 """With no index, SQLite has to read every page of the table: the plan says SCAN, and walking the leaf pages in
-id order, as the scan does, shows where kiwi@mail.test sits and why reading can't stop there.
+id order, as the scan does, shows where maria.lopez@gmail.com sits and why reading can't stop there.
 
-    python3 scan.py --quick                    # 100,000 rows: about a second
-    python3 scan.py                            # the notes' 1,000,000-row table: ~7 s, 35 MB in a temporary folder
-    python3 scan.py --email zyuznbio@inbox.test
+    python3 scan.py --quick                         # 100,000 rows: about a second
+    python3 scan.py                                 # the notes' 1,000,000-row table: ~9 s, 41 MB, temporary
+    python3 scan.py --email arjun.gupta352@gmail.com     # the newest user, id 1,000,000: met on the very last leaf
 
 The walk below is our own (it reads the file page by page); the plan is SQLite's. Standard library only.
 """
 
 from __future__ import annotations
 
-from usersdb import LINE, TARGET, Pages, args, built, plan, roots, scratch
+from usersdb import LINE, TARGET, Pages, args, built, nocase, plan, roots, scratch
 
 
 def main() -> None:
@@ -23,9 +23,10 @@ def main() -> None:
         root = roots(con)["users"]
         shape = pg.shape(root)
         n_leaves, found = shape["leaf_pages"], []
+        want = nocase(a.email)                                       # the column is COLLATE NOCASE
         for ordinal, leaf in enumerate(pg.leaves(root), 1):          # left to right = id order
             for rowid, row in leaf["cells"]:
-                if row[1] == a.email:
+                if nocase(row[1]) == want:
                     found.append((ordinal, leaf["pgno"], row))
             if ordinal in (1, 2, 3) or ordinal == n_leaves:
                 ids = [r for r, _ in leaf["cells"]]

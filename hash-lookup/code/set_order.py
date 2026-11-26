@@ -7,7 +7,7 @@ CPython 3.11 or newer, 64-bit, for the slot read-outs (ctypes); the rest runs an
 What to look at:
   1. small ints are their own hash, so you can predict a set's order by hand: slot = n & 7;
   2. one more element can make the set grow, and then every element sits in a different slot: the order changes;
-  3. str hashes are salted per process, so the same set of names prints in a different order in every run,
+  3. str hashes are salted per process, so the same set of names can print in a different order in each run,
      while a dict built from the same names keeps the order they went in, run after run.
 """
 

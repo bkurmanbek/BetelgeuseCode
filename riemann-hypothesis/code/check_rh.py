@@ -8,7 +8,7 @@ the halfway line, by walking up it and counting where a number flips sign. If th
 that height is off the line. The rest of this note is the maths behind the two counts.
 
     python3 check_rh.py 100             # T = 100: done in seconds
-    python3 check_rh.py 1000             # the run in the notes (both counts 649): takes minutes, not seconds
+    python3 check_rh.py 1000             # the run in the notes (both counts 649): about nine minutes
     python3 check_rh.py 300 --zetazero   # also count mpmath's own list of zeros below T
     python3 check_rh.py 100 --step 2     # a grid too coarse for the zeros: the counts disagree, and say so
 

@@ -91,7 +91,8 @@ def main() -> None:
           f"(equal and same hash: one key, the first key object kept, the last value)")
     nan = float("nan")
     print(f"  nan = float('nan'); nan in {{nan}} → {nan in {nan}}, float('nan') in {{nan}} → {float('nan') in {nan}}")
-    print("  (the stored key is checked with `is` before `==`, and nan != nan)")
+    print("  (the stored key is checked with `is` before `==`; a second NaN is another object, hashed by its")
+    print("   identity since Python 3.10, and nan != nan)")
 
     class OnlyEq:
         def __eq__(self, other):

@@ -3,7 +3,7 @@ own: a second B-tree, in the same file, next to the table's. Prints both trees s
 leaf page, one entry down to its bytes, and why a signpost page of the index points to fewer children.
 
     python3 index_pages.py --quick     # 100,000 rows: about a second
-    python3 index_pages.py             # the notes' 1,000,000-row table: ~4 s, 62 MB in a temporary folder
+    python3 index_pages.py             # the notes' 1,000,000-row table: ~5 s, 74 MB in a temporary folder
 
 Standard library only. Decodes pages per https://www.sqlite.org/fileformat2.html (sections 1.6 and 2.1).
 """

@@ -7,7 +7,8 @@ What it shows, read from memory (CPython):
   * nums = [3, 1, 4, 1, 7] built like the video, its slots before nums.insert(0, 2) and after: the address that
     was in slot i is now in slot i + 1, for every i, and slot 0 holds the 2. Same block, same capacity: only
     arrows moved (ins1 in Objects/listobject.c runs `items[i+1] = items[i]` from the last slot down)
-  * the count of moved arrows for inserting at the front of lists of growing length: always the whole length
+  * the same for lists of 10, 1,000 and 100,000 items, every slot read before and after: the whole length
+    moves, every time
   * collections.deque: a chain of fixed-size blocks with a free slot index at each end. appendleft writes into
     the free slot to the left of the first item, or links a new block on the left when there is none. The script
     reads the deque's left block and index (Modules/_collectionsmodule.c) and checks that the old first item is
@@ -69,13 +70,14 @@ def main() -> None:
     shifted = sum(after[i + 1] == before[i] for i in range(len(before)))
     print(f"  arrows that moved one slot right: {shifted} of {len(before)}, to add one item")
 
-    print("\nThe same at the front of longer lists (arrows moved = the length before the insert):")
+    print("\nThe same at the front of longer lists (every slot read before and after the insert):")
     for n in (10, 1_000, 100_000):
         lst = list(range(n))
-        old = slots(lst, 3)
+        old = slots(lst)
         lst.insert(0, -1)
-        print(f"  length {n:>7,}: slot 1 now holds what slot 0 held: {slots(lst, 2)[1] == old[0]}; "
-              f"{n:,} arrows moved")
+        new = slots(lst)
+        moved = sum(new[i + 1] == old[i] for i in range(n))
+        print(f"  length {n:>7,}: {moved:,} of {n:,} arrows now one slot to the right")
 
     print("\ncollections.deque, the structure built for both ends:")
     d = deque([3, 1, 4, 1, 7])

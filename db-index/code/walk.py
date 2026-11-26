@@ -1,18 +1,19 @@
-"""Follow SELECT * FROM users WHERE email = 'kiwi@mail.test' page by page, as SQLite does: down the index's
-B-tree from its root to the leaf that holds (kiwi@mail.test, id), then with that id down the table's own B-tree
-to the row. Every page is read from the database file and decoded here; the plans are SQLite's.
+"""Follow SELECT * FROM users WHERE email = 'maria.lopez@gmail.com' page by page, as SQLite does: down the index's
+B-tree from its root to the leaf that holds (maria.lopez@gmail.com, id), then with that id down the table's own
+B-tree to the row. Every page is read from the database file and decoded here; the plans are SQLite's.
 
-    python3 walk.py --quick                          # 100,000 rows: about a second
-    python3 walk.py                                  # the notes' 1,000,000-row table: ~4 s, 62 MB, temporary
-    python3 walk.py --email nobody@mail.test         # a missing key: the leaf proves it isn't there
-    python3 walk.py --db users.db                    # keep the database file
+    python3 walk.py --quick                             # 100,000 rows: about a second
+    python3 walk.py                                     # the notes' 1,000,000-row table: ~5 s, 74 MB, temporary
+    python3 walk.py --email daniel.kim@outlook.com      # nobody has it yet: the leaf proves it isn't there
+    python3 walk.py --email Maria.Lopez@Gmail.com       # the same pages: the email column ignores case (NOCASE)
+    python3 walk.py --db users.db                       # keep the database file
 
 Standard library only. Decodes pages per https://www.sqlite.org/fileformat2.html (section 1.6).
 """
 
 from __future__ import annotations
 
-from usersdb import LINE, TARGET, Pages, args, built, descend, plan, roots, scratch
+from usersdb import LINE, TARGET, Pages, args, built, descend, nocase, plan, roots, scratch
 
 
 def show_index_step(n: int, step: dict, email: str) -> None:
@@ -25,8 +26,10 @@ def show_index_step(n: int, step: dict, email: str) -> None:
         hi = step["hi"][0] if step["hi"] else "(end)"
         child = step["cells"][step["branch"]][0] if step["hi"] else step["right"]
         print(f" → {step['ncell'] + 1} children")
-        print(f"          {email} sorts between {lo} and {hi}:"
-              f" child {step['branch'] + 1} of {step['ncell'] + 1} → page {child:,}")
+        print(f"            {lo}")
+        print(f"          → {email} goes between these two keys:"
+              f" child {step['branch'] + 1} of {step['ncell'] + 1}, page {child:,}")
+        print(f"            {hi}")
         return
     print()
     pos = step["pos"]
@@ -50,8 +53,8 @@ def main() -> None:
         print(f"{LINE}   with ? = {a.email!r}")
         print(f"  EXPLAIN QUERY PLAN → {plan(con, LINE, (a.email,))}\n")
 
-        print("1) the index idx_users_email: (email, id) pairs in email order")
-        ipath = descend(pg, r["idx_users_email"], a.email)
+        print("1) the index idx_users_email: (email, id) pairs in email order (A-Z, ignoring case: COLLATE NOCASE)")
+        ipath = descend(pg, r["idx_users_email"], a.email, fold=nocase)
         for n, step in enumerate(ipath, 1):
             show_index_step(n, step, a.email)
         last = ipath[-1]

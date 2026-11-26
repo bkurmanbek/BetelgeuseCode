@@ -1,13 +1,19 @@
 """The users table every script here looks inside, and a reader for SQLite's own file pages.
 
-    python3 usersdb.py users.db                  # keep a copy to explore: 1,000,000 rows, ~3 s, 35 MB
-    python3 usersdb.py users.db --indexes        # the same with both indexes from the notes (78 MB)
+    python3 usersdb.py users.db                  # keep a copy to explore: 1,000,000 rows, ~4 s, 41 MB
+    python3 usersdb.py users.db --indexes        # the same with both indexes from the notes (~6 s, 90 MB)
     python3 usersdb.py users.db --rows 100000    # a smaller table
     sqlite3 users.db                             # then look yourself: SELECT * FROM dbstat WHERE name = 'users' LIMIT 5;
 
-The table is the one in the notes: users(id, email, city, age), 1,000,000 rows from a fixed seed (2026), made-up
-emails on .test domains, exactly one of them kiwi@mail.test. With the same SQLite version the scripts print the
-same page numbers as the notes, to the page.
+The table is the one in the notes:
+
+    CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT COLLATE NOCASE, city TEXT, age INTEGER)
+
+1,000,000 rows from a fixed seed (2026). The emails look real: common first and last names from many countries,
+paired at random, in the usual shapes (maria.lopez@, jkim@, sara_lee92@) at the big mail providers, so no row is a
+real person's data. Exactly one row is maria.lopez@gmail.com, the one the notes look up. COLLATE NOCASE makes the
+email column ignore upper and lower case, the usual choice for emails. With the same SQLite version the scripts
+print the same page numbers as the notes, to the page.
 
 The page reader follows the file format spec (https://www.sqlite.org/fileformat2.html, sections 1.3 and 1.6) and
 uses no SQLite call: it seeks to a page in the .db file and decodes its bytes. Imported by the other scripts.
@@ -21,40 +27,85 @@ import contextlib
 import os
 import random
 import sqlite3
-import string
 import struct
 import tempfile
-import time
 from pathlib import Path
 
 ROWS = 1_000_000
 QUICK_ROWS = 100_000
 SEED = 2026
-TARGET = "kiwi@mail.test"
-DOMAINS = ["mail.test", "post.test", "inbox.test", "box.test"]
-CITIES = ["Almaty", "Berlin", "Cairo", "Lima", "Oslo", "Paris", "Seoul", "Tokyo"]
+TARGET = "maria.lopez@gmail.com"
+PROBE = ("daniel.kim@outlook.com", "Seoul", 31)    # the one new row the notes write, and delete again (section 7.4)
+SCHEMA = "CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT COLLATE NOCASE, city TEXT, age INTEGER)"
 LINE = "SELECT * FROM users WHERE email = ?"
 INDEXES = {"email": "CREATE INDEX idx_users_email ON users(email)",
            "city_age": "CREATE INDEX idx_users_city_age ON users(city, age)"}
-PROBE = ("probe@box.test", "Oslo", 30)        # the one test row the notes write (section 7.4)
+# Mail providers by a rough share of personal addresses: an order-of-magnitude picture, not a market statistic.
+DOMAINS = {"gmail.com": 50, "yahoo.com": 12, "outlook.com": 12, "icloud.com": 10, "hotmail.com": 10, "proton.me": 6}
+CITIES = ["Almaty", "Berlin", "Cairo", "Lima", "Oslo", "Paris", "Seoul", "Tokyo"]
+FIRST = """emma olivia ava sophia mia isabella amelia harper ella grace chloe lily zoe hannah sarah anna laura julia
+maria sofia lucia elena carmen ana paula camila valentina gabriela daniela aigerim aliya dana madina zarina dinara
+asel kamila amina fatima leila yasmin nora ingrid freya astrid mei yuki hana sakura minji seoyeon priya ananya divya
+aisha zainab james john michael david daniel matthew andrew ryan ethan noah liam lucas mason logan jacob william
+thomas oliver jack henry samuel benjamin alexander max leon felix jonas lukas paul marco luca matteo diego carlos
+javier pablo miguel mateo santiago arman timur daniyar aidar yerlan askar ruslan omar ali hassan karim yusuf ivan
+dmitri alexei sergei kenji haruto takumi minho jisung wei jun raj arjun rohan vikram kwame kofi tunde emeka""".split()
+LAST = """smith johnson williams brown jones miller davis wilson anderson taylor thomas moore martin jackson white harris
+clark lewis walker hall young king wright scott green baker adams nelson hill campbell garcia rodriguez martinez
+hernandez lopez gonzalez perez sanchez ramirez torres flores rivera gomez diaz morales ortiz castro silva santos
+oliveira costa pereira ferreira rossi russo ferrari esposito bianchi romano colombo mueller schmidt schneider fischer
+weber meyer wagner becker hoffmann novak kowalski nowak ivanov petrov smirnov popov volkov sokolov kim lee park choi
+jung kang cho yoon tanaka suzuki sato takahashi watanabe ito nakamura wang li zhang liu chen yang huang zhao nguyen
+tran pham patel sharma singh kumar gupta khan ahmed hassan ibrahim mensah okafor adeyemi nurlanov seitkali abenov
+akhmetov omarov bekov iskakov suleimenov kassymov tulegenov ospanov""".split()
 
 
 # ---------------------------------------------------------------- the table
+
+def email_maker(rng: random.Random, reserved: set[str]):
+    """Real-looking, unique emails: first.last@gmail.com, jkim@yahoo.com, sara_lee92@icloud.com, ...
+    The same draws from the same random generator, in the same order, as the notes' run."""
+    used = set(reserved)
+    domains, weights = list(DOMAINS), list(DOMAINS.values())
+
+    def make() -> str:
+        first, last = rng.choice(FIRST), rng.choice(LAST)
+        style = rng.random()
+        if style < 0.40:
+            local = f"{first}.{last}"                  # maria.lopez
+        elif style < 0.55:
+            local = f"{first}{last}"                   # marialopez
+        elif style < 0.65:
+            local = f"{first}_{last}"                  # maria_lopez
+        elif style < 0.75:
+            local = f"{first[0]}{last}"                # mlopez
+        elif style < 0.90:
+            local = f"{first}.{last}{rng.randint(1, 99)}"   # maria.lopez86
+        else:
+            local = f"{first}{rng.randint(1970, 2007)}"     # maria1994
+        domain = rng.choices(domains, weights)[0]
+        email = f"{local}@{domain}"
+        while email in used:                           # taken: add digits, as a real sign-up form makes you do
+            email = f"{local}{rng.randint(1, 999)}@{domain}"
+        used.add(email)
+        return email
+    return make
+
 
 def build(path: Path, rows: int = ROWS) -> sqlite3.Connection:
     """users(id, email, city, age), no index yet: only the table's own B-tree, in id order."""
     path = Path(path)
     path.unlink(missing_ok=True)
     con = sqlite3.connect(path)
-    con.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT, city TEXT, age INTEGER)")
+    con.execute(SCHEMA)
     rng = random.Random(SEED)
     target_at = rng.randrange(rows)
+    make_email = email_maker(rng, {TARGET, PROBE[0]})
 
     def gen():
         for i in range(rows):
-            local = "kiwi" if i == target_at else "".join(rng.choices(string.ascii_lowercase, k=8))
-            email = TARGET if i == target_at else f"{local}@{rng.choice(DOMAINS)}"
-            yield email, rng.choice(CITIES), rng.randint(18, 80)
+            email = TARGET if i == target_at else make_email()
+            yield email, rng.choice(CITIES), rng.randint(18, 70)
 
     con.executemany("INSERT INTO users (email, city, age) VALUES (?, ?, ?)", gen())
     con.commit()
@@ -63,8 +114,8 @@ def build(path: Path, rows: int = ROWS) -> sqlite3.Connection:
 
 def make(path: Path, rows: int = ROWS, indexes: tuple[str, ...] = ()) -> tuple[sqlite3.Connection, dict]:
     """The table, then each index, in the same steps as the notes' run: after the table and after every
-    CREATE INDEX, one test row is written and deleted again (`one_write`, what writes.py looks at). That write
-    splits a leaf of a freshly built index, so doing it here keeps every page count equal to the notes'.
+    CREATE INDEX, one new user (PROBE, Daniel Kim) is written and deleted again (`one_write`, what writes.py looks
+    at). That write splits a leaf of a freshly built index, so doing it here keeps every page equal to the notes'.
     Returns the connection and {stage: pages that write changed}."""
     con = build(path, rows)
     writes = {"none": one_write(con, path)}
@@ -297,18 +348,30 @@ class Pages:
                 "avg_children": round(sum(inner) / len(inner)) if inner else None}
 
 
-def descend(pages: Pages, root: int, key) -> list[dict]:
+_UPPER = {c: c + 32 for c in range(ord("A"), ord("Z") + 1)}
+
+
+def nocase(s: str) -> str:
+    """The key SQLite's NOCASE collation compares: A-Z folded to a-z, nothing else (not é, not İ)."""
+    return s.translate(_UPPER)
+
+
+def descend(pages: Pages, root: int, key, fold=None) -> list[dict]:
     """The pages one lookup reads from the root to the leaf, as SQLite's B-tree code does: on each interior page,
     the first key ≥ the one we want says which child to read (fileformat2 section 1.6). `key` is a rowid for a
-    table, a value (or a tuple of values) for an index. Each step: the page, the branch taken, the keys around it."""
+    table, a value (or a tuple of values) for an index. `fold`: how the index compares text (`nocase` for the
+    email index, whose column is COLLATE NOCASE). Each step: the page, the branch taken, the keys around it."""
     path, pgno = [], root
     is_index = isinstance(key, (str, tuple))
     want = key if isinstance(key, tuple) else (key,)
+    if fold:
+        want = tuple(fold(v) if isinstance(v, str) else v for v in want)
 
     def k_of(cell):                                      # the comparable part of a cell
         if not is_index:
             return (cell[1] if isinstance(cell[1], int) else cell[0],)
-        return tuple(cell[1][:len(want)])
+        vals = cell[1][:len(want)]
+        return tuple(fold(v) if fold and isinstance(v, str) else v for v in vals)
 
     while True:
         p = pages.page(pgno)
@@ -350,11 +413,20 @@ def args(doc: str, extra=None) -> argparse.Namespace:
     return a
 
 
+def file_pages(path: Path) -> tuple[int, int]:
+    """(pages in the file, bytes per page), from the file header itself: bytes 28-31 and 16-17."""
+    with open(path, "rb") as f:
+        head = f.read(100)
+    size = int.from_bytes(head[16:18], "big")
+    return int.from_bytes(head[28:32], "big"), 65536 if size == 1 else size
+
+
 def built(a: argparse.Namespace, path: Path, indexes: tuple[str, ...] = ()) -> tuple[sqlite3.Connection, dict]:
-    t = time.perf_counter()
+    """Build the table (and the indexes asked for) and say what is in the file: pages, not seconds."""
     con, writes = make(path, a.n, indexes)
+    pages, size = file_pages(path)
     print(f"built users: {a.n:,} rows{' + ' + ', '.join(INDEXES[i].split()[2] for i in indexes) if indexes else ''}"
-          f" ({time.perf_counter() - t:.1f} s, SQLite {sqlite3.sqlite_version})\n")
+          f" · {pages:,} pages of {size:,} bytes · SQLite {sqlite3.sqlite_version}\n")
     return con, writes
 
 
@@ -364,6 +436,6 @@ if __name__ == "__main__":
     ap.add_argument("--rows", type=int, default=ROWS)
     ap.add_argument("--indexes", action="store_true", help="also create both indexes from the notes")
     a = ap.parse_args()
-    t = time.perf_counter()
     make(Path(a.db), a.rows, tuple(INDEXES) if a.indexes else ())[0].close()
-    print(f"{a.rows:,} rows in {a.db} ({os.path.getsize(a.db) / 1e6:,.0f} MB) in {time.perf_counter() - t:.1f} s")
+    pages, size = file_pages(Path(a.db))
+    print(f"{a.rows:,} rows in {a.db}: {pages:,} pages of {size:,} bytes ({os.path.getsize(a.db) / 1e6:,.0f} MB)")

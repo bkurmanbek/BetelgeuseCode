@@ -8,8 +8,8 @@ What it shows:
   * sys.getsizeof([]) and the pointer size: capacity = (getsizeof(lst) - getsizeof([])) // pointer size
   * after every append: the length, the bytes, the capacity, the spare slots, and a mark where the list asked
     for a bigger block (the capacity jumped). Most appends just use a spare slot.
-  * other ways to build a list of the same length and the capacity each one gets: little or no spare room
-    unless the list grew by appending
+  * other ways to build a list of the same length and the capacity each one gets: exactly the length, or the
+    length rounded up to even for list(x), unless the list grew by appending
 
 sys.getsizeof counts the list object and its block of slots, never the objects the slots point at.
 """
@@ -61,8 +61,9 @@ def main() -> None:
     }
     for name, other in built.items():
         print(f"  {name:<26} len {len(other):>4}   capacity {capacity(other):>4}   spare {capacity(other) - len(other):>4}")
-    print("A comprehension appends (the LIST_APPEND bytecode), so it grows like append and keeps its spare room;")
-    print("the others know the length up front and ask for a block that just fits it (give or take a slot).")
+    print("A comprehension appends (the LIST_APPEND bytecode), so it grows like append and keeps its spare room.")
+    print("The others know the length up front: [None] * n, copy() and slices get exactly n slots; list(x) of")
+    print("something with a length rounds n up to an even number (list_preallocate_exact, CPython 3.12).")
 
 
 if __name__ == "__main__":

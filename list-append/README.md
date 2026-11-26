@@ -27,14 +27,14 @@ arrow, and why `insert(0, x)` shifts every arrow in the list while a `deque` shi
 
 | | |
 |---|---|
-| [`notes.pdf`](notes.pdf) | The handout: what a slot holds, `[[0] * 3] * 3`, length vs capacity, append into a spare slot, a full block moving, the growth rule, the front of a list and `deque`, limits, common mistakes, exercises with answers |
+| [`notes.pdf`](notes.pdf) | The handout, typeset in LaTeX, plain words first: what a slot holds, `[[0] * 3] * 3`, length vs capacity, append into a spare slot (and the `LIST_APPEND` bytecode), a full block moving, the growth rule and why it copies fewer than 9 arrows per append, the front of a list and `deque`, limits, common mistakes, exercises with answers |
 | [`notebook.ipynb`](notebook.ipynb) | Look inside a list on your own machine, step by step, in seconds; `FULL = True` carries the growth run on to a million appends |
 | [`code/arrows.py`](code/arrows.py) | The slots of `nums = [3, 1, 4, 1]` read from memory next to `id()` of each item; the two 1s; 88 bytes either way |
 | [`code/grid.py`](code/grid.py) | `[[0] * 3] * 3`: three slots holding one address, the reference count, the comprehension fix, shallow and deep copies |
 | [`code/capacity.py`](code/capacity.py) | Length vs capacity with `sys.getsizeof` alone (no `ctypes`): every append, and other ways to build the same list |
 | [`code/watch_append.py`](code/watch_append.py) | The video's appends, reading `ob_size`, `allocated`, `ob_item` and `id` after each one |
 | [`code/growth_rule.py`](code/growth_rule.py) | Every resize of 1,000 appends (or a million) against CPython's formula; new address or grown in place; the tally |
-| [`code/front.py`](code/front.py) | `insert(0, 2)`: the slots before and after, every arrow one slot right; a `deque` adding a slot on the left instead |
+| [`code/front.py`](code/front.py) | `insert(0, 2)`: the slots before and after, every arrow one slot right (counted on lists of up to a hundred thousand items); a `deque` adding a slot on the left instead |
 | [`code/listpeek.py`](code/listpeek.py) | The small `ctypes` reader the scripts share, with a layout check that stops on interpreters it doesn't fit |
 | [`figures/`](figures) | The pictures in the notes, stills from the video lesson |
 
@@ -45,7 +45,7 @@ Python 3.9 or newer, standard library only; every script runs in well under a se
 ```bash
 python3 code/watch_append.py                     # the five appends, from the list's own fields
 python3 code/watch_append.py --items 3 1 4 1 7 9 2 6 5 3
-python3 code/growth_rule.py --n 1000000          # a million appends: under a second, about 50 MB
+python3 code/growth_rule.py --n 1000000          # a million appends: under a second, about 55 MB
 python3 code/capacity.py                         # no ctypes: works on any CPython
 ```
 

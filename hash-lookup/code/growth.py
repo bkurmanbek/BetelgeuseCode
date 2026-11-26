@@ -17,6 +17,7 @@ import argparse
 import sys
 
 import cpython_tables as ct
+from people import emails
 
 
 def set_grown_size(used: int) -> int:
@@ -40,13 +41,14 @@ def main() -> None:
         print(f"(slot counts skipped: {e})\n")
         peek = False
 
-    print("dict with str keys: where sys.getsizeof jumps")
+    keys = emails(a.upto)                      # made-up email addresses: str keys, like the notes' run
+    print("dict with str keys (email addresses): where sys.getsizeof jumps")
     print(f"{'keys':>7} {'bytes':>8} {'slots':>7} {'fit before next jump':>21}   rule")
     d: dict = {}
     last = sys.getsizeof(d)
     print(f"{0:>7} {last:>8} {'shared':>7} {0:>21}")
     for n in range(1, a.upto + 1):
-        d[f"key{n:06d}"] = n
+        d[keys[n - 1]] = n
         size = sys.getsizeof(d)
         if size != last:
             row = f"{n:>7} {size:>8}"
@@ -59,14 +61,14 @@ def main() -> None:
             print(row)
             last = size
 
-    print("\nset: where sys.getsizeof jumps")
+    print("\nset of the same addresses: where sys.getsizeof jumps")
     print(f"{'items':>7} {'bytes':>8} {'slots':>7}   rule")
     s: set = set()
     last = sys.getsizeof(s)
     print(f"{0:>7} {last:>8} {ct.read_set(s)['size'] if peek else '':>7}   (8 slots live inside the set object)")
     slots = ct.MIN_SIZE
     for n in range(1, a.upto + 1):
-        s.add(f"key{n:06d}")
+        s.add(keys[n - 1])
         size = sys.getsizeof(s)
         if size != last:
             row = f"{n:>7} {size:>8}"
@@ -77,7 +79,7 @@ def main() -> None:
                 slots = got
             print(row)
             last = size
-    print("\nThe bytes are the table only: the keys and values are separate objects, not counted by getsizeof.")
+    print("\ngetsizeof counts the object and its table; the keys and values are separate objects, not counted.")
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@
 What it shows, from the running interpreter:
   * the list object's own address and size, and the address of its block of slots
   * each slot read from memory next to id() of the item: the same number. The slot stores where the object is.
-  * nums[1] is nums[3]: two slots, one object (CPython keeps one object for each small int)
+  * nums[1] is nums[3]: two slots, one object (CPython keeps one shared object for each int from -5 to 256)
   * the same four slots holding four strings of 1,000 letters: the list's size doesn't change, the strings
     live elsewhere
 
@@ -59,7 +59,7 @@ def main() -> None:
     nums = build([3, 1, 4, 1])
     show("nums = [3, 1, 4, 1]", nums, raw)
     print(f"\nnums[1] is nums[3] → {nums[1] is nums[3]}: both slots point at one int object, at {id(nums[1]):#x}")
-    print("  (CPython creates the small ints once, at start-up, and every 1 in the program is that object)")
+    print("  (CPython keeps one ready-made object for each int from -5 to 256: every 1 a program uses is that one)")
     print(f"  id(nums) {id(nums):#x} vs id(nums[0]) {id(nums[0]):#x}: the list and its items are separate objects")
 
     print()

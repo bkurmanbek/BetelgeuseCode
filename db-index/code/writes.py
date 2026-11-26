@@ -1,10 +1,10 @@
-"""Every write updates every index. Inserts one row three times (no index, then after CREATE INDEX on email, then
-after a second index on (city, age)), compares the database file before and after, page by page, and names the
-B-tree each changed page belongs to, with its cells and free bytes before → after. The row is deleted after each
-look, so the three writes are the same.
+"""Every write updates every index. Inserts one new user, Daniel Kim from Seoul, three times (with no index, then
+after CREATE INDEX on email, then after a second index on (city, age)), compares the database file before and
+after, page by page, and names the B-tree each changed page belongs to, with its cells and free bytes before →
+after. The row is deleted after each look, so the three writes are the same.
 
     python3 writes.py --quick          # 100,000 rows: about a second
-    python3 writes.py                  # the notes' 1,000,000-row table: ~7 s, 78 MB in a temporary folder
+    python3 writes.py                  # the notes' 1,000,000-row table: ~6 s, 90 MB in a temporary folder
 
 Standard library only. Page headers decoded per https://www.sqlite.org/fileformat2.html (sections 1.3 and 1.6).
 """
