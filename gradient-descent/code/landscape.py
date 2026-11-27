@@ -1,26 +1,30 @@
 """Two knobs: the video's landscape, the gradient (the arrow made of the two slopes), and the walks on it: into the
-deep valley, into the shallow one, and a step too big to ever settle. Drawn as a text map you can read in a terminal.
+deep valley, into the shallow one, into a small dip that traps a plain walk, a heavy ball (momentum) that rolls
+through that dip, and a step too big to ever settle. Drawn as text maps you can read in a terminal.
 
     python3 landscape.py                    # everything the video shows on the landscape, instantly
-    python3 landscape.py --eta 0.9          # the walk from the video's start with another step size
-    python3 landscape.py --start 2.5 -2 --eta 0.6
-    python3 landscape.py --rows 21          # a shorter map, square on paper (the notes print this one)
+    python3 landscape.py --eta 0.69         # the walk from the video's start with another step size
+    python3 landscape.py --start 0.6 -2.6 --eta 0.6
+    python3 landscape.py --start 0.6 -2.6 --eta 0.15 --beta 0.5    # a heavy ball with less memory
+    python3 landscape.py --rows 21          # shorter maps, square on paper (the notes print one)
     python3 landscape.py --plot             # also draws landscape.png (needs matplotlib; the rest doesn't)
 
-The landscape (the same formula as the video):
+The landscape (the same formula as the video): a gentle bowl plus eight bumps, each a bell-shaped dent or hill
 
-    h(x, y) = 0.08 (x^2 + y^2)                                    a gentle bowl
-              - 1.0  * exp(-((x - 1.2)^2 + (y - 0.6)^2) / 1.0)    a deep valley
-              - 0.6  * exp(-((x + 1.4)^2 + (y + 1.1)^2) / 0.7)    a shallow valley
-              + 0.35 * exp(-((x + 0.2)^2 + (y - 1.8)^2) / 0.5)    a hill
+    h(x, y) = 0.06 (x^2 + y^2) + sum of  a * exp(-((x - cx)^2 + (y - cy)^2) / w)
 
-x and y are the two knobs; h is the height, the number we want small. A walker only gets the height and the two
-slopes where it stands (here from the formula; check_slopes() shows they agree with two nearby heights). The rule:
+with (a, cx, cy, w) listed in BUMPS below: a < 0 is a dent, a > 0 a hill, w sets its width. x and y are the two
+knobs; h is the height, the number we want small. The land drawn in the video is the square |x|, |y| <= 2.9.
+
+A walker only gets the height and the two slopes where it stands (here from the formula; check_slopes() shows they
+agree with two nearby heights). The rule:
 
     (x, y)  ->  (x, y) - eta * (slope along x, slope along y)
 
 It stops when the arrow is shorter than 0.001 (the ground is flat), after 400 steps, or if it leaves the map
-(|x| or |y| > 3.2): the same rules as the video's runs. Standard library only.
+(|x| or |y| > 3.2): the same rules as the video's runs. The heavy ball keeps a velocity v instead:
+v -> beta * v + slope, (x, y) -> (x, y) - eta * v, and stops when the ground is flat and it has stopped moving.
+Standard library only.
 """
 
 from __future__ import annotations
@@ -28,10 +32,19 @@ from __future__ import annotations
 import argparse
 import math
 
-BOWL = 0.08
-BUMPS = [(-1.0, 1.2, 0.6, 1.0), (-0.6, -1.4, -1.1, 0.7), (0.35, -0.2, 1.8, 0.5)]   # (height, x, y, width^2)
-START, OTHER_START = (-1.9, 2.5), (-2.6, 0.4)
-ETA, BIG_ETA = 0.6, 1.4
+BOWL = 0.06
+BUMPS = [(-1.15, 1.3, 0.7, 0.85),    # the deep valley                      (height a, centre cx, cy, width^2 w)
+         (-0.70, -1.5, -1.2, 0.55),  # the shallow valley
+         (0.60, 0.0, 1.9, 0.45),     # the big hill at the back
+         (0.45, -0.55, -0.05, 0.22), # a round hill in the middle
+         (0.40, -2.0, 0.8, 0.35),    # a hill on the left
+         (0.35, 1.9, -1.6, 0.40),    # a hill at the front right
+         (-0.30, 0.5, -1.0, 0.18),   # the small dip (a trap for a plain walk)
+         (0.25, 2.2, 2.2, 0.50)]     # a far corner rise
+LAND = 2.9                           # the land the video draws: |x|, |y| <= 2.9
+START, OTHER_START, TRAP_START = (-1.9, 2.5), (-2.6, 0.2), (0.6, -2.6)
+ETA, BIG_ETA = 0.5, 1.0
+HEAVY_ETA, BETA = 0.15, 0.9          # the heavy ball
 
 
 def h(x, y):
@@ -81,6 +94,21 @@ def walk(x, y, eta, tol=1e-3, cap=400, box=3.2):
     return path
 
 
+def heavy(x, y, eta, beta, tol=1e-3, cap=5000, box=3.2):
+    """Momentum (Polyak's heavy ball): each step keeps beta of the last velocity and adds the new slope."""
+    path, vx, vy = [(x, y)], 0.0, 0.0
+    for _ in range(cap):
+        gx, gy = grad(x, y)
+        if math.hypot(gx, gy) < tol and math.hypot(vx, vy) * eta < tol * eta:
+            break
+        vx, vy = beta * vx + gx, beta * vy + gy
+        x, y = x - eta * vx, y - eta * vy
+        path.append((x, y))
+        if abs(x) > box or abs(y) > box:
+            break
+    return path
+
+
 def bottom_from(x, y):
     """Walk with small steps until the ground is flat, then polish with Newton's method; check it is a bottom."""
     x, y = walk(x, y, 0.3, tol=1e-9, cap=20_000)[-1]
@@ -96,10 +124,10 @@ def bottom_from(x, y):
     return x, y, lo, hi
 
 
-def ascii_map(paths, marks, cols=61, rows=31, span=3.0) -> str:
-    """Heights as shades (low ' .:-=+*#%@ high), contour bands every 0.1; walk points and marks on top."""
+def ascii_map(paths, marks, cols=59, rows=31, span=LAND) -> str:
+    """Heights as shades (low ' .:-=+*#%@ high) over the land; walk points and marks on top."""
     ramp = " .:-=+*#%@"
-    lo, hi = -0.9, 1.3
+    lo, hi = -1.05, 1.05
     grid = []
     for r in range(rows):
         y = span - 2 * span * r / (rows - 1)
@@ -127,26 +155,41 @@ def ascii_map(paths, marks, cols=61, rows=31, span=3.0) -> str:
 
 def report_walk(name, path, eta, every=1):
     print(f"\n{name}: eta = {eta}, from ({path[0][0]:g}, {path[0][1]:g})")
-    print(f"{'step':>5} {'x':>9} {'y':>9} {'height':>9} {'slope x':>9} {'slope y':>9} {'arrow':>8}")
+    print(f"{'step':>5} {'x':>9} {'y':>9} {'height':>9} {'slope x':>9} {'slope y':>9} {'arrow':>8} {'step len':>9}")
     for k, (x, y) in enumerate(path):
         if k % every and k != len(path) - 1:
             continue
         gx, gy = grad(x, y)
-        print(f"{k:>5} {x:>9.4f} {y:>9.4f} {h(x, y):>9.4f} {gx:>9.4f} {gy:>9.4f} {math.hypot(gx, gy):>8.4f}")
+        moved = math.dist(path[k - 1], path[k]) if k else 0.0
+        print(f"{k:>5} {x:>9.4f} {y:>9.4f} {h(x, y):>9.4f} {gx:>9.4f} {gy:>9.4f} {math.hypot(gx, gy):>8.4f}"
+              f" {moved:>9.4f}")
+
+
+def ends_at(path, bottoms) -> str:
+    x, y = path[-1]
+    for name, b in bottoms.items():
+        if math.dist((x, y), b[:2]) < 0.01:
+            return f"the {name} bottom"
+    if max(abs(x), abs(y)) > 3.2:
+        return "off the map"
+    return "not settled, still moving"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0], formatter_class=argparse.RawTextHelpFormatter)
     ap.add_argument("--eta", type=float, help="walk from the video's start (or --start) with this step size")
     ap.add_argument("--start", type=float, nargs=2, metavar=("X", "Y"), help="where your walk starts")
+    ap.add_argument("--beta", type=float, help="make your walk a heavy ball with this much memory (0 to 1)")
     ap.add_argument("--rows", type=int, default=31, help="rows of the text maps (default 31, square in a terminal)")
     ap.add_argument("--plot", action="store_true", help="also draw landscape.png with matplotlib")
     a = ap.parse_args()
 
-    deep, shallow = bottom_from(1.2, 0.6), bottom_from(-1.4, -1.1)
-    print("two bottoms (slope 0, and curving up in every direction):")
-    for name, (x, y, lo, hi) in (("deep", deep), ("shallow", shallow)):
-        print(f"  {name:<8} at ({x:.6f}, {y:.6f})  height {h(x, y):.6f}  curvatures {lo:.6f} and {hi:.6f}")
+    bottoms = {"deep": bottom_from(1.2, 0.6), "shallow": bottom_from(-1.4, -1.1), "dip": bottom_from(0.5, -0.9)}
+    deep, shallow, dip = bottoms["deep"], bottoms["shallow"], bottoms["dip"]
+    print("three bottoms (slope 0, and curving up in every direction), each with the step size it can settle under:")
+    for name, (x, y, lo, hi) in bottoms.items():
+        print(f"  {name:<8} at ({x:.6f}, {y:.6f})  height {h(x, y):+.6f}  curvatures {lo:.6f} and {hi:.6f}"
+              f"  limit 2 / {hi:.4f} = {2 / hi:.4f}")
 
     gx, gy = grad(*START)
     fx, fy = check_slopes(*START)
@@ -157,69 +200,89 @@ def main() -> None:
           " the steepness uphill")
     print(f"  the walk steps against it: by -eta * ({gx:.3f}, {gy:.3f})")
 
-    if a.eta is not None or a.start:
+    if a.eta is not None or a.start or a.beta is not None:
         eta, start = a.eta if a.eta is not None else ETA, tuple(a.start) if a.start else START
-        path = walk(*start, eta)
-        report_walk("your walk", path, eta, every=max(1, len(path) // 40))
-        x, y = path[-1]
-        flat = math.hypot(*grad(x, y)) < 1e-3
-        print(f"\n{len(path) - 1} steps; ends at height {h(x, y):.4f}: "
-              + ("flat ground, a bottom" if flat else "left the map" if max(abs(x), abs(y)) > 3.2 else
-                 "still moving after 400 steps"))
-        print(ascii_map([(path, "o")], [(start, "S")], rows=a.rows))
+        if a.beta is not None:
+            path, name, cap = heavy(*start, eta, a.beta), f"your heavy ball (beta = {a.beta})", 5000
+        else:
+            path, name, cap = walk(*start, eta), "your walk", 400
+        report_walk(name, path, eta, every=max(1, len(path) // 40))
+        print(f"\n{len(path) - 1} steps (at most {cap}); it ends at height {h(*path[-1]):.4f}: {ends_at(path, bottoms)}")
+        print(ascii_map([(path, "o")], [(start, "S"), (deep[:2], "D"), (shallow[:2], "s"), (dip[:2], "d")],
+                        rows=a.rows))
         return
 
     hero = walk(*START, ETA)
     report_walk("the walk into the deep valley", hero, ETA)
-    print(f"  -> {len(hero) - 1} steps; it ends {math.dist(hero[-1], deep[:2]):.6f} from the deep bottom")
+    print(f"  -> {len(hero) - 1} steps; it ends {math.dist(hero[-1], deep[:2]):.6f} from the deep bottom. Look at the"
+          " step lengths: they shrink on a flat shelf, then grow as it drops")
 
     other = walk(*OTHER_START, ETA)
     report_walk("the same rule from another start", other, ETA)
     print(f"  -> {len(other) - 1} steps; it ends {math.dist(other[-1], shallow[:2]):.6f} from the shallow bottom,"
           f" height {h(*other[-1]):.4f}: a bottom, not the lowest one")
 
+    trap = walk(*TRAP_START, ETA)
+    report_walk("and from a third start", trap, ETA)
+    print(f"  -> {len(trap) - 1} steps; it stops {math.dist(trap[-1], dip[:2]):.6f} from the bottom of the small dip,"
+          f" height {h(*trap[-1]):.4f}")
+
+    ball = heavy(*TRAP_START, HEAVY_ETA, BETA)
+    in_at = next(k for k, p in enumerate(ball) if math.dist(p, deep[:2]) < 0.05)
+    past = next(k for k, p in enumerate(ball) if p[1] > dip[1] + 0.3)
+    report_walk(f"a heavy ball from the same third start (beta = {BETA})", ball, HEAVY_ETA, every=4)
+    print(f"  -> past the dip by step {past}, first in the deep valley (within 0.05 of its bottom) at step {in_at},"
+          f" then it swings and settles: {len(ball) - 1} steps, {math.dist(ball[-1], deep[:2]):.6f} from the bottom")
+
     limit = 2 / deep[3]
     print(f"\nthe step-size limit of the deep valley: 2 / (its steepest curvature {deep[3]:.6f}) = {limit:.4f}")
     big = walk(*START, BIG_ETA, cap=30)
     fell = next(k for k, p in enumerate(big) if h(*p) < -0.8)
-    report_walk(f"a step past the limit", big, BIG_ETA)
+    report_walk("a step past the limit", big, BIG_ETA)
     long = walk(*START, BIG_ETA, cap=2000)
     settled = len(long) <= 2000
     print(f"  -> it falls in at step {fell} (height below -0.8), then bounces from wall to wall; "
           f"{'settled' if settled else 'still not settled'} after {len(long) - 1} steps")
 
-    print("\nthe map seen from above (x across, y up, both from -3 to 3): dark ' ' is low, '@' is high;")
-    print("'o' the walk into the deep valley (S its start, D the deep bottom), 'x' the other walk (s the shallow bottom)")
-    print(ascii_map([(hero, "o"), (other, "x")],
-                    [(START, "S"), (OTHER_START, "S"), (deep[:2], "D"), (shallow[:2], "s")], rows=a.rows))
+    print("\nthe land seen from above (x across, y up, both from -2.9 to 2.9): ' ' is low, '@' is high;")
+    print("S the starts; 'o' the walk into the deep valley (D its bottom), 'x' the walk into the shallow one (s),")
+    print("'v' the walk that stops in the small dip (d)")
+    print(ascii_map([(hero, "o"), (other, "x"), (trap, "v")],
+                    [(START, "S"), (OTHER_START, "S"), (TRAP_START, "S"), (deep[:2], "D"), (shallow[:2], "s"),
+                     (dip[:2], "d")], rows=a.rows))
+    print(f"\nfrom the third start: 'v' the plain walk (eta = {ETA}), 'o' the heavy ball (eta = {HEAVY_ETA},"
+          f" beta = {BETA})")
+    print(ascii_map([(ball, "o"), (trap, "v")], [(TRAP_START, "S"), (deep[:2], "D"), (dip[:2], "d")], rows=a.rows))
     print(f"\nthe walk with eta = {BIG_ETA} ('o'): it reaches the deep valley and keeps jumping across it")
     print(ascii_map([(big, "o")], [(START, "S"), (deep[:2], "D")], rows=a.rows))
 
     if a.plot:
-        plot(hero, other, big, deep, shallow)
+        plot(hero, other, trap, ball, big, bottoms)
 
 
-def plot(hero, other, big, deep, shallow) -> None:
+def plot(hero, other, trap, ball, big, bottoms) -> None:
     try:
         import matplotlib.pyplot as plt
     except ImportError:
         raise SystemExit("--plot needs matplotlib (pip install matplotlib); everything else runs without it")
     n = 121
-    xs = [-3.2 + 6.4 * i / (n - 1) for i in range(n)]
+    xs = [-LAND + 2 * LAND * i / (n - 1) for i in range(n)]
     Z = [[h(x, y) for x in xs] for y in xs]
     fig, ax = plt.subplots(figsize=(6.4, 6))
     cs = ax.contourf(xs, xs, Z, levels=24, cmap="Blues_r")
     ax.contour(xs, xs, Z, levels=24, colors="k", linewidths=0.3, alpha=0.4)
     fig.colorbar(cs, ax=ax, label="height")
-    for path, c, lab in ((hero, "#B57600", f"eta = {ETA}"), (other, "#7C3AED", f"eta = {ETA}, other start"),
-                         (big, "#B42A30", f"eta = {BIG_ETA}")):
-        ax.plot([p[0] for p in path], [p[1] for p in path], "o-", ms=3, lw=1, color=c, label=lab)
-    ax.plot(*deep[:2], "o", mfc="none", mec="#1E7346", ms=12, mew=2)
-    ax.plot(*shallow[:2], "o", mfc="none", mec="#1E7346", ms=12, mew=2)
+    for path, c, lab in ((big, "#B42A30", f"eta = {BIG_ETA}"),          # the long walks first, so the others show
+                         (ball, "#1E7346", f"heavy ball, eta = {HEAVY_ETA}, beta = {BETA}"),
+                         (hero, "#B57600", f"eta = {ETA}"), (other, "#7C3AED", f"eta = {ETA}, another start"),
+                         (trap, "#5C636E", f"eta = {ETA}, a third start")):
+        ax.plot([p[0] for p in path], [p[1] for p in path], "o-", ms=2.5, lw=1, color=c, label=lab)
+    for x, y, _, _ in bottoms.values():
+        ax.plot(x, y, "o", mfc="none", mec="#1E7346", ms=12, mew=2)
     ax.set_xlabel("first knob, x")
     ax.set_ylabel("second knob, y")
     ax.set_aspect("equal")
-    ax.legend(loc="lower right", fontsize=8)
+    ax.legend(loc="lower left", fontsize=7)
     fig.tight_layout()
     fig.savefig("landscape.png", dpi=150)
     print("wrote landscape.png")
