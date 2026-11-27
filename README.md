@@ -17,5 +17,4 @@ code behind every picture.
 ## About
 
 Made by Bakytzhan Kurmanbek.
-Short versions of every lesson: [TikTok](https://www.tiktok.com/@code_easy8).
 Ideas for a lesson, a collaboration or a project? bakytzhan.kurmanbek@nu.edu.kz
